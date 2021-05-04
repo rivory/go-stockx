@@ -1,6 +1,6 @@
 ## go-stockx
 
-go-stockx is a Unoficial Go client library for accessing the StockX API.
+go-stockx is an unofficial Go client library for accessing the StockX API.
 
 ## Usage :
 
