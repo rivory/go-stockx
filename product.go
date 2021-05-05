@@ -52,8 +52,8 @@ type Variant struct {
 }
 
 type ProductDetail struct {
-	Product
-	Variants []Variant
+	Product Product
+	// Variants []Variant
 }
 
 type Market struct {
@@ -117,10 +117,16 @@ func (s *ProductService) Search(ctx context.Context, opts *ProductsOptions) (p *
 // Get a single product.
 // Allows passing product ID, product UUID, product URL key to fetch details about a singe product.
 func (s *ProductService) Get(ctx context.Context, id string) (p *ProductDetail, err error) {
-	// body, err := s.client.Request(URIStockxProduct+id+"?includes=market&currency=EUR", nil)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	body, err := s.client.Request(URIStockxProduct+id+"?includes=market&currency=EUR", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	p = &ProductDetail{}
+	err = json.Unmarshal(body, p)
+	if err != nil {
+		return nil, err
+	}
 
 	return p, nil
 }
