@@ -13,5 +13,5 @@ Example :
 		Name: "yeezy",
 	}
 
-	p, err := client.Products(opts)
+	p, err := client.Products.Search(ctx, opts)
 ```
