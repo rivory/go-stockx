@@ -106,15 +106,12 @@ func (s *ProductService) Search(ctx context.Context, opts *ProductsOptions) (p *
 		return nil, err
 	}
 
-	// spew.Dump(string(body))
-	// return nil, nil
-	products := Products{}
-	err = json.Unmarshal(body, &products)
+	err = json.Unmarshal(body, p)
 	if err != nil {
 		return nil, err
 	}
 
-	return &products, nil
+	return p, nil
 }
 
 // Get a single product.
