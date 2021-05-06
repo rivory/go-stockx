@@ -97,7 +97,9 @@ type SearchProductsOptions struct {
 }
 
 // Search provides a list of products.
-// It takes optionnal ProductsOptions.
+// It takes optionnal SearchProductsOptions.
+//
+// Without opts the method will return first X items returned by stockX API.
 func (s *ProductService) Search(ctx context.Context, opts *SearchProductsOptions) (p *Products, err error) {
 	body, err := s.client.Request(URIStockxSearch, opts)
 	if err != nil {
@@ -114,6 +116,8 @@ func (s *ProductService) Search(ctx context.Context, opts *SearchProductsOptions
 
 // GetProductOptions specifies the optional parameters to the
 // Get method.
+//
+// Without opts the method will return basic product info and variants size.
 type GetProductOptions struct {
 	Includes string `url:"includes,omitempty"`
 	Currency string `url:"currency,omitempty"`
