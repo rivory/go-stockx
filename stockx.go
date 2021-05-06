@@ -1,7 +1,7 @@
 package stockx
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/google/go-querystring/query"
@@ -64,7 +64,7 @@ func (c *Client) Request(uri string, opts interface{}) (b []byte, err error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
