@@ -8,9 +8,9 @@ Example :
 
 Search for items
 ``` go
-  client, _ := stockx.NewClient("User Agent")
+	client, _ := stockx.NewClient("User Agent")
 
-	opts := &stockx.ProductsOptions{
+	opts := &stockx.SearchProductsOptions{
 		Name: "yeezy",
 	}
 
@@ -22,5 +22,9 @@ Get item details
 ``` go
 	client, _ := stockx.NewClient("User Agent")
 
-	p, err := client.Products.Get(ctx, "185ecb6f-2402-467c-8db4-c846bf8cdb7a")
+	opts := &stockx.GetProductOptions{
+		Includes: "market",
+		Currency: "EUR",
+	}
+	p, err := client.Products.Get(ctx, "185ecb6f-2402-467c-8db4-c846bf8cdb7a", opts)
 ```

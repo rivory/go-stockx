@@ -3,6 +3,9 @@ package stockx
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+
+	"github.com/mitchellh/mapstructure"
 )
 
 type ProductService service
@@ -39,21 +42,16 @@ type Product struct {
 	Shoe        string
 	Title       string
 	URLKey      string
-	// Market Market ToDo:
 	Media       Media
 	ObjectID    string
 	BelowRetail bool
+	Variants    []Variant `mapstructure:"omitempty"`
 }
 
 type Variant struct {
 	ShoeSize string
 	UUID     string
-	Market   Market `mapstructure:"omitempty"`
-}
-
-type ProductDetail struct {
-	Product Product
-	// Variants []Variant
+	Market   *Market `mapstructure:"omitempty"`
 }
 
 type Market struct {
@@ -91,16 +89,16 @@ type Media struct {
 	Gallery       []string
 }
 
-// ProductsOptions specifies the optional parameters to the
+// SearchProductsOptions specifies the optional parameters to the
 // Products method.
-type ProductsOptions struct {
+type SearchProductsOptions struct {
 	Name string `url:"_search,omitempty"`
 	PaginationOptions
 }
 
 // Search provides a list of products.
 // It takes optionnal ProductsOptions.
-func (s *ProductService) Search(ctx context.Context, opts *ProductsOptions) (p *Products, err error) {
+func (s *ProductService) Search(ctx context.Context, opts *SearchProductsOptions) (p *Products, err error) {
 	body, err := s.client.Request(URIStockxSearch, opts)
 	if err != nil {
 		return nil, err
@@ -114,18 +112,57 @@ func (s *ProductService) Search(ctx context.Context, opts *ProductsOptions) (p *
 	return p, nil
 }
 
+// GetProductOptions specifies the optional parameters to the
+// Get method.
+type GetProductOptions struct {
+	Includes string `url:"includes,omitempty"`
+	Currency string `url:"currency,omitempty"`
+}
+
 // Get a single product.
 // Allows passing product ID, product UUID, product URL key to fetch details about a singe product.
-func (s *ProductService) Get(ctx context.Context, id string) (p *ProductDetail, err error) {
-	body, err := s.client.Request(URIStockxProduct+id+"?includes=market&currency=EUR", nil)
+func (s *ProductService) Get(ctx context.Context, id string, opts *GetProductOptions) (p *Product, err error) {
+	body, err := s.client.Request(URIStockxProduct+id, opts)
 	if err != nil {
 		return nil, err
 	}
 
-	p = &ProductDetail{}
-	err = json.Unmarshal(body, p)
+	var data map[string]interface{}
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		fmt.Printf("Error parsing JSON string - %s", err)
+	}
+
+	pmap := data["Product"]
+	p = &Product{}
+	err = mapstructure.Decode(pmap, p)
 	if err != nil {
 		return nil, err
+	}
+
+	childmap, ok := pmap.(map[string]interface{})["children"].(map[string]interface{})
+	if ok {
+		for _, child := range childmap {
+			v := &Variant{}
+			err = mapstructure.Decode(child, v)
+			if err != nil {
+				return nil, err
+			}
+			marketmap, ok := child.(map[string]interface{})["market"].(map[string]interface{})
+			if ok {
+				if len(marketmap) != 0 {
+					m := &Market{}
+					err = mapstructure.Decode(marketmap, m)
+					if err != nil {
+						return nil, err
+					}
+					v.Market = m
+				} else {
+					v.Market = nil
+				}
+			}
+			p.Variants = append(p.Variants, *v)
+		}
 	}
 
 	return p, nil
