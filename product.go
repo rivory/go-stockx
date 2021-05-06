@@ -99,9 +99,10 @@ type SearchProductsOptions struct {
 // Search provides a list of products.
 // It takes optionnal SearchProductsOptions.
 //
+// The result set is paged, iteration procedure is command with PaginationOptions
 // Without opts the method will return first X items returned by stockX API.
 func (s *ProductService) Search(ctx context.Context, opts *SearchProductsOptions) (p *Products, err error) {
-	body, err := s.client.Request(URIStockxSearch, opts)
+	body, err := s.client.Request(ctx, URIStockxSearch, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +127,7 @@ type GetProductOptions struct {
 // Get a single product.
 // Allows passing product ID, product UUID, product URL key to fetch details about a singe product.
 func (s *ProductService) Get(ctx context.Context, id string, opts *GetProductOptions) (p *Product, err error) {
-	body, err := s.client.Request(URIStockxProduct+id, opts)
+	body, err := s.client.Request(ctx, URIStockxProduct+id, opts)
 	if err != nil {
 		return nil, err
 	}

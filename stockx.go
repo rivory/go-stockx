@@ -1,6 +1,7 @@
 package stockx
 
 import (
+	"context"
 	"io"
 	"net/http"
 
@@ -47,8 +48,8 @@ func NewClient(userAgent string) (c *Client, err error) {
 }
 
 // Request creates an API request.
-func (c *Client) Request(uri string, opts interface{}) (b []byte, err error) {
-	req, err := http.NewRequest("GET", uri, nil)
+func (c *Client) Request(ctx context.Context, uri string, opts interface{}) (b []byte, err error) {
+	req, err := http.NewRequestWithContext(ctx, "GET", uri, nil)
 	if err != nil {
 		return nil, err
 	}
