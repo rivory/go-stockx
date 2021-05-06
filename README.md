@@ -8,6 +8,7 @@ Example :
 
 Search for items
 ``` go
+	ctx := context.Background()
 	client, _ := stockx.NewClient("User Agent")
 
 	opts := &stockx.SearchProductsOptions{
@@ -20,6 +21,7 @@ Search for items
 
 Get item details
 ``` go
+	ctx := context.Background()
 	client, _ := stockx.NewClient("User Agent")
 
 	opts := &stockx.GetProductOptions{
